@@ -1,0 +1,9 @@
+#cloud-config
+${common-config}
+  - sudo -u postgres psql -c "CREATE ROLE elma365 WITH login password 'SecretPassword';"
+  - sudo -u postgres psql -c "CREATE DATABASE elma365 WITH OWNER elma365;"
+  - sudo -u postgres psql -d elma365 -c "CREATE EXTENSION \"uuid-ossp\"; CREATE EXTENSION pg_trgm;"
+  - sudo sed -i 's/max_connections = 100/ max_connections = 2000/' /etc/postgresql/15/main/postgresql.conf
+  - sudo sed -i "s/#listen_addresses = 'localhost'/ listen_addresses = 'localhost, 192.168.1.21'/" /etc/postgresql/15/main/postgresql.conf
+  - echo "host    all             all             192.168.0.0/16              md5" >> /etc/postgresql/15/main/pg_hba.conf
+  - sudo systemctl restart postgresql

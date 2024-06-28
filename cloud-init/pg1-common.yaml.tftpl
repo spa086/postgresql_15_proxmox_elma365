@@ -1,0 +1,43 @@
+users:
+  - name: ${username}
+    passwd: ${password}
+    lock_passwd: false
+    groups: [ adm, cdrom, dip, plugdev, lxd, sudo ]
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${pub-key}
+
+
+hostname: ${hostname}
+package_update: true
+package_upgrade: true
+timezone: Europe/Moscow
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/01-harden-ssh.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      ChallengeResponseAuthentication no
+      UsePAM no
+
+packages:
+  - qemu-guest-agent
+  - net-tools
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gpg
+  - open-iscsi
+  - jq
+  - postgresql
+  - postgresql-contrib
+
+power_state:
+    delay: now
+    mode: reboot
+    message: Rebooting after cloud-init completion
+    condition: true
+
+runcmd:
+  - systemctl enable qemu-guest-agent
